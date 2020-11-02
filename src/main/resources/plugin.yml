@@ -1,0 +1,8 @@
+name: AngelEnderChest
+version: @version@
+main: com.vergilprime.AngelEnderChest.AngelEnderChest
+api-version: 1.16
+prefix: AC
+authors: [ VergilPrime ]
+description: Expand players' Ender Chests and allow instant access with /chest.
+website: Angels-Reach.com
