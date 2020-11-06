@@ -30,7 +30,7 @@ public abstract class Database {
     public void initialize() {
         connection = getSQLConnection();
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + table + " WHERE uuid = ?");
+            PreparedStatement ps = connection.prepareStatement("SELECT TOP 1 * FROM " + table + ";");
             ResultSet rs = ps.executeQuery();
             close(ps, rs);
 
@@ -55,9 +55,13 @@ public abstract class Database {
             while (rs.next()) {
                 String invstring = rs.getString("ender_chest");
 
-                Inventory inventory = InventorySerializer.fromBase64(invstring);
+                if (!invstring.isEmpty()) {
+                    Inventory inventory = InventorySerializer.fromBase64(invstring);
 
-                return inventory;
+                    //TODO: Check slot permissions and shrink or expand as needed
+
+                    return inventory;
+                }
             }
         } catch (SQLException | IOException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
@@ -77,7 +81,10 @@ public abstract class Database {
         while (!player.hasPermission("AngelEnderChest.Slots." + maxslots) && maxslots > 27) {
             maxslots -= 9;
         }
-        return Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
+
+        Inventory aEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
+
+        return aEChest;
     }
 
     // Now we need methods to save things to the database

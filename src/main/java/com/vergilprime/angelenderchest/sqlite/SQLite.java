@@ -21,7 +21,7 @@ public class SQLite extends Database {
 
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS `ender_chests` (" +
             "`uuid` UUID NOT NULL," +
-            "`ender_chest` VARCHAR(64) NOT NULL" +
+            "`ender_chest` VARCHAR(MAX) NOT NULL" +
             "PRIMARY KEY (`uuid`)" +
             ");";
 

@@ -1,11 +1,9 @@
 package com.vergilprime.angelenderchest;
 
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
 public class ChestCommand implements CommandExecutor {
 
@@ -17,11 +15,11 @@ public class ChestCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-
-        Inventory aechest = Bukkit.createInventory(player, 27, "Angel Ender Chest");
-
-        player.openInventory(aechest);
-
+        if (player.hasPermission("AngelEnderChest.ChestCommand")) {
+            player.openInventory(player.getEnderChest());
+        } else {
+            player.sendMessage("You must vote in order to open your Enderchest anywhere. Open the menu blook with crouch + swap hands (shift + f) and click Vote Links.");
+        }
         return true;
     }
 }
