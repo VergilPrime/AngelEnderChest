@@ -36,5 +36,7 @@ public class EnderChestListener implements Listener {
 
     public void onInventoryClose(InventoryCloseEvent event) {
         //TODO: How do I know this is an enderchest?
+        Player player = (Player) event.getPlayer();
+        sqlite.saveEnderChest(player, event.getInventory());
     }
 }

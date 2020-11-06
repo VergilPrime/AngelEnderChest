@@ -58,9 +58,36 @@ public abstract class Database {
                 if (!invstring.isEmpty()) {
                     Inventory inventory = InventorySerializer.fromBase64(invstring);
 
-                    //TODO: Check slot permissions and shrink or expand as needed
+                    int maxslots = 54;
+                    while (!player.hasPermission("AngelEnderChest.Slots." + maxslots) && maxslots > 27) {
+                        maxslots -= 9;
+                    }
 
-                    return inventory;
+                    if (inventory.getSize() > maxslots) {
+
+                        Inventory newAEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
+                        int i;
+
+                        for (i = 0; i < newAEChest.getSize(); i++) {
+                            newAEChest.setItem(i, inventory.getItem(i));
+                        }
+
+                        for (i = i; i < inventory.getSize(); i++) {
+                            if (inventory.getItem(i) != null) {
+                                player.getWorld().dropItemNaturally(player.getLocation(), inventory.getItem(i));
+                            }
+                        }
+
+                    } else if (inventory.getSize() < maxslots) {
+
+                        Inventory newAEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
+
+                        for (int i = 0; i < inventory.getSize(); i++) {
+                            newAEChest.setItem(i, inventory.getItem(i));
+                        }
+                    } else {
+                        return inventory;
+                    }
                 }
             }
         } catch (SQLException | IOException ex) {
