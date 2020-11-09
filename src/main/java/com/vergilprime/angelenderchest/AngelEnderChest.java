@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class AngelEnderChest extends JavaPlugin {
     public SQLite sqlite;
+    public OpenAEChestsShelf openAEChestsShelf;
 
     @Override
     public void onEnable() {

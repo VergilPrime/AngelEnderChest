@@ -2,6 +2,7 @@ package com.vergilprime.angelenderchest.sqlite;
 
 import com.vergilprime.angelenderchest.AngelEnderChest;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -41,8 +42,7 @@ public abstract class Database {
 
     // These are the methods you can use to get things out of your database. You of course can make new ones to return different things in the database.
     // This returns the number of people the player killed.
-    public Inventory getEnderChest(Player player) {
-        UUID uuid = player.getUniqueId();
+    public Inventory getEnderChest(UUID uuid) {
         Connection conn = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -58,36 +58,10 @@ public abstract class Database {
                 if (!invstring.isEmpty()) {
                     Inventory inventory = InventorySerializer.fromBase64(invstring);
 
-                    int maxslots = 54;
-                    while (!player.hasPermission("AngelEnderChest.Slots." + maxslots) && maxslots > 27) {
-                        maxslots -= 9;
-                    }
-
-                    if (inventory.getSize() > maxslots) {
-
-                        Inventory newAEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
-                        int i;
-
-                        for (i = 0; i < newAEChest.getSize(); i++) {
-                            newAEChest.setItem(i, inventory.getItem(i));
-                        }
-
-                        for (i = i; i < inventory.getSize(); i++) {
-                            if (inventory.getItem(i) != null) {
-                                player.getWorld().dropItemNaturally(player.getLocation(), inventory.getItem(i));
-                            }
-                        }
-
-                    } else if (inventory.getSize() < maxslots) {
-
-                        Inventory newAEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
-
-                        for (int i = 0; i < inventory.getSize(); i++) {
-                            newAEChest.setItem(i, inventory.getItem(i));
-                        }
-                    } else {
-                        return inventory;
-                    }
+                    return inventory;
+                } else {
+                    OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+                    return Bukkit.createInventory((Player) player, 27, player.getName() + "'s Ender Chest");
                 }
             }
         } catch (SQLException | IOException ex) {
@@ -104,19 +78,11 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
         }
-        int maxslots = 54;
-        while (!player.hasPermission("AngelEnderChest.Slots." + maxslots) && maxslots > 27) {
-            maxslots -= 9;
-        }
-
-        Inventory aEChest = Bukkit.createInventory(player, maxslots, "Angel Ender Chest");
-
-        return aEChest;
+        return null;
     }
 
     // Now we need methods to save things to the database
-    public void saveEnderChest(Player player, Inventory aechest) {
-        UUID uuid = player.getUniqueId();
+    public void saveEnderChest(UUID uuid, Inventory aechest) {
         String stringInventory = InventorySerializer.toBase64(aechest);
         Connection conn = null;
         PreparedStatement ps = null;
