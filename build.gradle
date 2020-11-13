@@ -48,7 +48,7 @@ spigot {
     name = project.description
     description = "Expand players' Ender Chests and allow instant access via /chest."
     commands {
-        AChest {
+        Chest {
             description = "Access your Ender Chest anywhere."
             permission = "AngelEnderChest.ChestCommand"
             permissionMessage = "You must vote to gain access to your Ender Chest anywhere."

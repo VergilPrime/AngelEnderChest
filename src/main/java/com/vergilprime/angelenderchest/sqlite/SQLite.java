@@ -16,7 +16,7 @@ public class SQLite extends Database {
 
     public SQLite(AngelEnderChest instance) {
         super(instance);
-        dbname = plugin.getConfig().getString("SQLite.Filename", "ender_chests"); // Set the table name here e.g player_kills
+        dbname = "storage.db"; // Set the table name here e.g player_kills
     }
 
     public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS `ender_chests` (" +

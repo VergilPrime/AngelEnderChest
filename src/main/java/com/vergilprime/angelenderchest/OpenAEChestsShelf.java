@@ -30,7 +30,11 @@ public class OpenAEChestsShelf {
                 return false;
             }
             player.openInventory(aechest);
+        } else {
+            player.sendMessage("You don't have permission to open another player's Ender Chest.");
+            return false;
         }
+        return true;
     }
 
     public Inventory loadAEChest(UUID uuid) {
