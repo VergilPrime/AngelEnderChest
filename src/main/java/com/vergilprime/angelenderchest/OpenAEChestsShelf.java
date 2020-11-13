@@ -6,16 +6,18 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import java.util.Map;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class OpenAEChestsShelf {
     private final AngelEnderChest plugin;
-    private Map<UUID, Inventory> AEChests;
+    private HashMap<UUID, Inventory> AEChests;
 
     public OpenAEChestsShelf(AngelEnderChest plugin) {
         this.plugin = plugin;
+        AEChests = new HashMap<>();
     }
+
 
     public boolean openAEChest(Player player, UUID uuid) {
         if (player.getUniqueId() == uuid || player.hasPermission("AngelEnderChest.admin")) {

@@ -18,10 +18,13 @@ import java.util.logging.Level;
 public abstract class Database {
     AngelEnderChest plugin;
     Connection connection;
-    public String table = "ender_chests";
+    String dbname;
+    String tablename;
 
-    public Database(AngelEnderChest instance) {
-        plugin = instance;
+    public Database(AngelEnderChest plugin) {
+        this.plugin = plugin;
+        dbname = plugin.config.getString("database");
+        tablename = plugin.config.getString("tablename");
     }
 
     public abstract Connection getSQLConnection();
@@ -31,7 +34,7 @@ public abstract class Database {
     public void initialize() {
         connection = getSQLConnection();
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT TOP 1 * FROM " + table + ";");
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM `" + tablename + "` LIMIT 1;");
             ResultSet rs = ps.executeQuery();
             close(ps, rs);
 
@@ -48,7 +51,7 @@ public abstract class Database {
         ResultSet rs = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("SELECT ender_chest FROM " + table + " WHERE uuid = '" + uuid + "';");
+            ps = conn.prepareStatement("SELECT ender_chest FROM " + tablename + " WHERE uuid = '" + uuid + "';");
 
             rs = ps.executeQuery();
 
@@ -88,7 +91,7 @@ public abstract class Database {
         PreparedStatement ps = null;
         try {
             conn = getSQLConnection();
-            ps = conn.prepareStatement("REPLACE INTO " + table + " (uuid,ender_chest) VALUES(?,?)");
+            ps = conn.prepareStatement("REPLACE INTO " + tablename + " (uuid,ender_chest) VALUES(?,?)");
             ps.setObject(1, uuid);
             ps.setString(2, stringInventory);
             ps.executeUpdate();

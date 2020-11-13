@@ -12,18 +12,20 @@ import java.util.logging.Level;
 
 
 public class SQLite extends Database {
-    String dbname;
-
-    public SQLite(AngelEnderChest instance) {
-        super(instance);
-        dbname = "storage.db"; // Set the table name here e.g player_kills
-    }
-
-    public String SQLiteCreateTokensTable = "CREATE TABLE IF NOT EXISTS `ender_chests` (" +
-            "`uuid` UUID NOT NULL," +
-            "`ender_chest` VARCHAR(MAX) NOT NULL" +
+    private String dbname;
+    private String tablename;
+    private String SQLiteCreateTable = "CREATE TABLE IF NOT EXISTS `" + tablename + "` (" +
+            "`uuid` UUID NOT NULL, " +
+            "`ender_chest` TEXT NOT NULL, " +
             "PRIMARY KEY (`uuid`)" +
             ");";
+
+
+    public SQLite(AngelEnderChest plugin) {
+        super(plugin);
+        dbname = plugin.config.getString("database");
+        tablename = plugin.config.getString("tablename");
+    }
 
 
     // SQL creation stuff, You can leave the blow stuff untouched.
@@ -57,7 +59,7 @@ public class SQLite extends Database {
         connection = getSQLConnection();
         try {
             Statement s = connection.createStatement();
-            s.executeUpdate(SQLiteCreateTokensTable);
+            s.executeUpdate(SQLiteCreateTable);
             s.close();
         } catch (SQLException e) {
             e.printStackTrace();
