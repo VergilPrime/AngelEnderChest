@@ -11,12 +11,10 @@ public final class AngelEnderChest extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        config.addDefault("debugging", false);
         config.addDefault("database", "storage");
-        config.options().copyDefaults(true);
         config.addDefault("tablename", "angelenderchest");
-        config.options().copyDefaults(true);
         config.addDefault("username", "username");
-        config.options().copyDefaults(true);
         config.addDefault("password", "password");
         config.options().copyDefaults(true);
         saveConfig();
@@ -25,5 +23,10 @@ public final class AngelEnderChest extends JavaPlugin {
         getCommand("Chest").setExecutor(new com.vergilprime.angelenderchest.ChestCommand());
         sqlite = new SQLite(this);
         sqlite.load();
+    }
+
+    @Override
+    public void onDisable() {
+        //TODO: Save all open chests        
     }
 }

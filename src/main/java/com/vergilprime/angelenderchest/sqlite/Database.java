@@ -20,11 +20,13 @@ public abstract class Database {
     Connection connection;
     String dbname;
     String tablename;
+    Boolean debugging;
 
     public Database(AngelEnderChest plugin) {
         this.plugin = plugin;
         dbname = plugin.config.getString("database");
         tablename = plugin.config.getString("tablename");
+        debugging = plugin.config.getBoolean("debugging");
     }
 
     public abstract Connection getSQLConnection();
@@ -59,8 +61,7 @@ public abstract class Database {
                 String invstring = rs.getString("ender_chest");
 
                 if (!invstring.isEmpty()) {
-                    Inventory inventory = InventorySerializer.fromBase64(invstring);
-
+                    Inventory inventory = InventorySerializer.fromBase64(uuid, invstring);
                     return inventory;
                 } else {
                     OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);

@@ -14,12 +14,14 @@ import java.util.logging.Level;
 public class SQLite extends Database {
     private String dbname;
     private String tablename;
+    private boolean debugging;
 
 
     public SQLite(AngelEnderChest plugin) {
         super(plugin);
         dbname = plugin.config.getString("database");
         tablename = plugin.config.getString("tablename");
+        debugging = plugin.config.getBoolean("debugging");
     }
 
 
@@ -36,12 +38,10 @@ public class SQLite extends Database {
         }
         try {
             if (connection != null && !connection.isClosed()) {
-                plugin.getLogger().log(Level.INFO, "SQLite connection already exists");
                 return connection;
             }
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            plugin.getLogger().log(Level.INFO, "New SQLite connection established");
             return connection;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
@@ -54,20 +54,13 @@ public class SQLite extends Database {
     @Override
     public void load() {
         connection = getSQLConnection();
-        if (connection != null) {
-            plugin.getLogger().log(Level.INFO, "Connection is not null");
-        } else {
-            plugin.getLogger().log(Level.SEVERE, "Connection null");
-        }
         try {
             Statement statement = connection.createStatement();
-            plugin.getLogger().log(Level.INFO, "Executing table creation.");
             boolean result = statement.execute("CREATE TABLE IF NOT EXISTS `" + tablename + "` (" +
                     "`uuid` UUID NOT NULL, " +
                     "`ender_chest` TEXT NOT NULL, " +
                     "PRIMARY KEY (`uuid`)" +
                     ");");
-            plugin.getLogger().log(Level.INFO, "Table creaetion complete: " + result);
             statement.close();
         } catch (SQLException e) {
             plugin.getLogger().log(Level.SEVERE, "SQLite failed to load", e);

@@ -8,27 +8,49 @@ import org.bukkit.inventory.Inventory;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class OpenAEChestsShelf {
     private final AngelEnderChest plugin;
-    private HashMap<UUID, Inventory> AEChests;
+    private HashMap<UUID, Inventory> aEChests;
+    private Boolean debugging;
 
     public OpenAEChestsShelf(AngelEnderChest plugin) {
         this.plugin = plugin;
-        AEChests = new HashMap<>();
+        aEChests = new HashMap<>();
+        debugging = plugin.getConfig().getBoolean("debugging");
     }
 
 
     public boolean openAEChest(Player player, UUID uuid) {
+        if (debugging) {
+            if (player.getUniqueId() == uuid) {
+                plugin.getLogger().log(Level.INFO, player.getName() + " is opening their own AEChest.");
+            } else if (player.hasPermission("AngelEnderChest.admin")) {
+                plugin.getLogger().log(Level.INFO, player.getName() + " is opening someone else's AEChest.");
+            } else {
+                plugin.getLogger().log(Level.INFO, player.getName() + " can't open someone else's AEChest.");
+            }
+        }
         if (player.getUniqueId() == uuid || player.hasPermission("AngelEnderChest.admin")) {
-            Inventory aechest = AEChests.get(uuid);
+            if (debugging) {
+                plugin.getLogger().log(Level.INFO, "Grabbing AEChest from memory.");
+            }
+            Inventory aechest = aEChests.get(uuid);
             if (aechest == null) {
+                if (debugging) {
+                    plugin.getLogger().log(Level.INFO, "Grabbing AEChest from database.");
+                }
                 aechest = loadAEChest(uuid);
             }
             if (aechest == null) {
+                if (debugging) {
+                    plugin.getLogger().log(Level.INFO, "Creating AEChest from scratch.");
+                }
                 aechest = createAEChest(uuid);
             }
             if (aechest == null) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to create AEChest.");
                 return false;
             }
             player.openInventory(aechest);
@@ -40,7 +62,9 @@ public class OpenAEChestsShelf {
     }
 
     public Inventory loadAEChest(UUID uuid) {
-        return registerOpenAEChest(plugin.sqlite.getEnderChest(uuid));
+        Inventory inventory = plugin.sqlite.getEnderChest(uuid);
+        registerOpenAEChest(inventory);
+        return (inventory);
     }
 
     public Inventory createAEChest(UUID uuid) {
@@ -57,24 +81,32 @@ public class OpenAEChestsShelf {
         }
         int size = rows * 9;
         String playername = offlinePlayer.getName();
-        return Bukkit.createInventory((HumanEntity) offlinePlayer, size, playername + "'s Ender Chest");
-    }
-
-    public Inventory registerOpenAEChest(Inventory inventory) {
-        if (inventory == null) {
-            return null;
-        }
-        OfflinePlayer inventoryHolder = (OfflinePlayer) inventory.getHolder();
-        UUID uuid = inventoryHolder.getUniqueId();
-        AEChests.put(uuid, inventory);
+        Inventory inventory = Bukkit.createInventory((HumanEntity) offlinePlayer, size, playername + "'s Ender Chest");
+        registerOpenAEChest(inventory);
         return inventory;
     }
 
+    public void registerOpenAEChest(Inventory inventory) {
+        if (inventory != null) {
+            OfflinePlayer inventoryHolder = (OfflinePlayer) inventory.getHolder();
+            if (inventoryHolder == null) {
+                plugin.getLogger().log(Level.SEVERE, "Failed to create AEChest.");
+            }
+            UUID uuid = inventoryHolder.getUniqueId();
+            aEChests.put(uuid, inventory);
+        }
+    }
+
     public void unregisterOpenAEChest(UUID uuid) {
-        AEChests.remove(uuid);
+        if (debugging) {
+            plugin.getLogger().log(Level.INFO, "Saving inventory.");
+        }
+        Inventory inventory = aEChests.get(uuid);
+        plugin.sqlite.saveEnderChest(uuid, inventory);
+        aEChests.remove(uuid);
     }
 
     public boolean isOpenAEChest(Inventory inventory) {
-        return AEChests.containsValue(inventory);
+        return aEChests.containsValue(inventory);
     }
 }
