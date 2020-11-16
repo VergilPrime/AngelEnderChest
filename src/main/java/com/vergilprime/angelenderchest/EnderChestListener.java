@@ -9,6 +9,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
@@ -34,7 +35,7 @@ public class EnderChestListener implements Listener {
         if (debugging) {
             plugin.getLogger().log(Level.INFO, player.getName() + " attempting to open an inventory.");
         }
-        if (event.getInventory().getType().toString() == "ENDER_CHEST") {
+        if (event.getInventory().getType() == InventoryType.ENDER_CHEST) {
             if (debugging) {
                 plugin.getLogger().log(Level.INFO, player.getName() + " attempting to open Ender Chest.");
             }
