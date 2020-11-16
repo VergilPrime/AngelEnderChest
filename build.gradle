@@ -9,7 +9,7 @@ plugins {
 apply plugin: 'java'
 
 group = 'com.vergilprime'
-version = '0.1'
+version = '1.0 beta'
 jar.archiveFileName = 'AngelEnderChest.jar'
 
 sourceCompatibility = '1.8'
