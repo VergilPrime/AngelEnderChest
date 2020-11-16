@@ -30,12 +30,15 @@ public class EnderChestListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onInventoryOpen(InventoryOpenEvent event) {
+        Player player = (Player) event.getPlayer();
+        if (debugging) {
+            plugin.getLogger().log(Level.INFO, player.getName() + " attempting to open an inventory.");
+        }
         if (event.getInventory().getType().toString() == "ENDER_CHEST") {
-            Player player = (Player) event.getPlayer();
             if (debugging) {
                 plugin.getLogger().log(Level.INFO, player.getName() + " attempting to open Ender Chest.");
             }
-            if (player.getGameMode() == GameMode.CREATIVE && !player.hasPermission("AngelCreative.InvOverride")) {
+            if (player.getGameMode() == GameMode.CREATIVE && !player.hasPermission("AngelEnderChest.CreativeOverride")) {
                 player.sendMessage("You don't have permission to open EnderChest in creative mode.");
             } else {
                 if (debugging) {
@@ -44,6 +47,10 @@ public class EnderChestListener implements Listener {
                 plugin.openAEChestsShelf.openAEChest(player, player.getUniqueId());
             }
             event.setCancelled(true);
+        } else {
+            if (debugging) {
+                plugin.getLogger().log(Level.INFO, "Type: " + event.getInventory().getType().toString());
+            }
         }
     }
 

@@ -75,12 +75,15 @@ public class OpenAEChestsShelf {
         int rows = 3;
         if (offlinePlayer.isOnline()) {
             rows = 6;
-            while (!((Player) offlinePlayer).hasPermission("AngelEnderChest.Rows." + rows) && rows > 3) {
+            while (rows > 3 && !((Player) offlinePlayer).hasPermission("AngelEnderChest.Rows." + rows)) {
                 rows--;
             }
         }
         int size = rows * 9;
         String playername = offlinePlayer.getName();
+        if (debugging) {
+            plugin.getLogger().log(Level.INFO, "Creating AEChest for " + playername + ".");
+        }
         Inventory inventory = Bukkit.createInventory((HumanEntity) offlinePlayer, size, playername + "'s Ender Chest");
         registerOpenAEChest(inventory);
         return inventory;
