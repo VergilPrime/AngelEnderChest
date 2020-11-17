@@ -14,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -54,54 +53,51 @@ public abstract class Database {
     public Inventory getEnderChest(UUID uuid) {
         Connection conn = null;
         PreparedStatement ps = null;
-        ResultSet rs = null;
+        ResultSet rs;
         try {
             conn = getSQLConnection();
             ps = conn.prepareStatement("SELECT ender_chest FROM " + tablename + " WHERE uuid = '" + uuid + "';");
 
             rs = ps.executeQuery();
 
-            while (rs.next()) {
-                String invstring = rs.getString("ender_chest");
+            rs.next();
+            String invstring = rs.getString("ender_chest");
 
-                OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-                if (!invstring.isEmpty()) {
-                    Inventory inventory = InventorySerializer.fromBase64(uuid, invstring);
-                    if (player.isOnline()) {
-                        Integer rows = 6;
-                        while (rows > 3 && !((Player) player).hasPermission("AngelEnderChest.Rows." + rows)) {
-                            rows--;
-                        }
-                        if (debugging) {
-                            plugin.getLogger().log(Level.INFO, "Rows: " + rows);
-                        }
-                        if (rows * 9 != inventory.getSize()) {
-                            Inventory newinventory = Bukkit.createInventory((Player) player, rows * 9, player.getName() + "'s Ender Chest");
-                            Iterator<ItemStack> invIterator = inventory.iterator();
-                            while (invIterator.hasNext()) {
-                                ItemStack itemStack = invIterator.next();
-                                if (itemStack != null) {
-                                    HashMap<Integer, ItemStack> leftOvers = newinventory.addItem(itemStack);
-                                    if (!leftOvers.isEmpty()) {
-                                        leftOvers.forEach((key, itemStack2) -> {
-                                            HashMap<Integer, ItemStack> leftOvers2 = ((Player) player).getInventory().addItem(itemStack2);
-                                            if (!leftOvers2.isEmpty()) {
-                                                leftOvers2.forEach((key2, itemStack3) -> {
-                                                    Location location = ((Player) player).getLocation();
-                                                    ((Player) player).getWorld().dropItem(location, itemStack3);
-                                                });
-                                            }
-                                        });
-                                    }
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            if (!invstring.isEmpty()) {
+                Inventory inventory = InventorySerializer.fromBase64(uuid, invstring);
+                if (player.isOnline()) {
+                    int rows = 6;
+                    while (rows > 3 && !((Player) player).hasPermission("AngelEnderChest.Rows." + rows)) {
+                        rows--;
+                    }
+                    if (debugging) {
+                        plugin.getLogger().log(Level.INFO, "Rows: " + rows);
+                    }
+                    if (rows * 9 != inventory.getSize()) {
+                        Inventory newinventory = Bukkit.createInventory((Player) player, rows * 9, player.getName() + "'s Ender Chest");
+                        for (ItemStack itemStack : inventory) {
+                            if (itemStack != null) {
+                                HashMap<Integer, ItemStack> leftOvers = newinventory.addItem(itemStack);
+                                if (!leftOvers.isEmpty()) {
+                                    leftOvers.forEach((key, itemStack2) -> {
+                                        HashMap<Integer, ItemStack> leftOvers2 = ((Player) player).getInventory().addItem(itemStack2);
+                                        if (!leftOvers2.isEmpty()) {
+                                            leftOvers2.forEach((key2, itemStack3) -> {
+                                                Location location = ((Player) player).getLocation();
+                                                ((Player) player).getWorld().dropItem(location, itemStack3);
+                                            });
+                                        }
+                                    });
                                 }
                             }
-                            return newinventory;
                         }
+                        return newinventory;
                     }
-                    return inventory;
-                } else {
-                    return Bukkit.createInventory((Player) player, 27, player.getName() + "'s Ender Chest");
                 }
+                return inventory;
+            } else {
+                return Bukkit.createInventory((Player) player, 27, player.getName() + "'s Ender Chest");
             }
         } catch (SQLException | IOException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
@@ -131,7 +127,6 @@ public abstract class Database {
             ps.setObject(1, uuid);
             ps.setString(2, stringInventory);
             ps.executeUpdate();
-            return;
         } catch (SQLException ex) {
             plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionExecute(), ex);
         } finally {
@@ -146,7 +141,6 @@ public abstract class Database {
                 plugin.getLogger().log(Level.SEVERE, Errors.sqlConnectionClose(), ex);
             }
         }
-        return;
     }
 
 

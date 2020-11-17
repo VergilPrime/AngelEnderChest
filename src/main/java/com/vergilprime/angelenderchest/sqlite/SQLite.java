@@ -56,14 +56,13 @@ public class SQLite extends Database {
         connection = getSQLConnection();
         try {
             Statement statement = connection.createStatement();
-            boolean result = statement.execute("CREATE TABLE IF NOT EXISTS `" + tablename + "` (" +
+            statement.execute("CREATE TABLE IF NOT EXISTS `" + tablename + "` (" +
                     "`uuid` UUID NOT NULL, " +
                     "`ender_chest` TEXT NOT NULL, " +
-                    "PRIMARY KEY (`uuid`)" +
-                    ");");
+                    "PRIMARY KEY (`uuid`));");
             statement.close();
         } catch (SQLException e) {
-            plugin.getLogger().log(Level.SEVERE, "SQLite failed to load", e);
+            plugin.getLogger().log(Level.SEVERE, "SQLite tables failed to create, check SQLite.java 59-63", e);
         }
         initialize();
     }
